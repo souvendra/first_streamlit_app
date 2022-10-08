@@ -28,7 +28,13 @@ def get_fruityvice_data(this_fruit_choice):
   fruityvice_response = requests.get("https://fruityvice.com/api/fruit/" + fruit_choice )
   fruityvice_normalized = pandas.json_normalize(fruityvice_response.json())
   return fruityvice_normalized
-  
+ 
+  #Snowflake related functions
+def get_fruit_load_list():
+  with my_cnx.cursor() as my_cur:
+    my_cur.execute("SELECT * from fruit_load_list")
+    return my_cur.fetchall()
+    
 # New Section to Display fruitvice api response
 streamlit.header("Fruityvice Fruit Advice!")
 try:
@@ -39,17 +45,15 @@ try:
     back_from_function=get_fruityvice_data(fruit_choice)
     streamlit.dataframe(back_from_function)
     streamlit.header("The fruit load list contains:")
-  #Snowflake related functions
-  def get_fruit_load_list():
-    with my_cnx.cursor() as my_cur:
-      my_cur.execute("SELECT * from fruit_load_list")
-      return my.cur.fetchall()
+  
+  
   
   # Add a button to load a fruit
   if streamlit.button('Get Fruit Load List'):
     my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
     my_data_rows = get_fruit_load_list()
     streamlit.dataframe(my_data_rows)
+    
 except URLError as e: 
   streamlit.error()
 
